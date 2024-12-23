@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ "$DEBUG" == "1" ]; then
+    set -x
+fi
+
 set -e
 
 echo "[cont-init.d] 00-config.sh - Starting..."
