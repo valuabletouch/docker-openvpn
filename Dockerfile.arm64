@@ -40,8 +40,8 @@ RUN set -ex; \
 COPY rootfs/ /
 
 RUN chmod a+x /usr/local/bin/ovpn_*
-RUN chmod a+x /cont-init.d/*
-RUN chmod a+x /services.d/*/run
+RUN chmod a+x /etc/cont-init.d/*
+RUN chmod a+x /etc/services.d/*/run
 
 ENV OPENVPN=/etc/openvpn
 ENV OPENVPN_CONF=$OPENVPN/openvpn.conf
