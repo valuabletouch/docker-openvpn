@@ -1,7 +1,7 @@
 #
 # Docker + OpenVPN systemd service
 #
-# Author: Yasin AKAR <yasin.akar@valuabletouch.com>
+# Author: Mehmet Yasin AKAR <yasin.akar@valuabletouch.com>
 # Source: https://github.com/valuabletouch/docker-openvpn
 #
 # This service aims to make the update and invocation of the docker-openvpn
