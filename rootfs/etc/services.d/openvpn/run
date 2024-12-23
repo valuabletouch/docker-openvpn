@@ -1,15 +1,3 @@
 #!/usr/bin/env bash
 
-if [ "$DEBUG" == "1" ]; then
-    set -x
-
-    whoami
-fi
-
-s6-setuidgid root
-
-if [ "$DEBUG" == "1" ]; then
-    whoami
-fi
-
 exec ovpn_run

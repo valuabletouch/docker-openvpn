@@ -3,6 +3,7 @@ services:
     build: .
     restart: unless-stopped
     container_name: openvpn
+    privileged: true
     cap_add:
       - NET_ADMIN
     sysctls:
