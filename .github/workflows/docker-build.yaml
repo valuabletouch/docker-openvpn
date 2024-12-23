@@ -49,3 +49,14 @@ jobs:
           file: ./Dockerfile
           context: .
           tags: ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest
+          pull: true
+
+      - name: Build and push '${{ github.repository_owner }}/openvpn:latest-aarch64'
+        uses: docker/build-push-action@v6
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          file: ./Dockerfile.aarch64
+          context: .
+          tags: ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest-aarch64
+          pull: true
+          platforms: linux/arm64
