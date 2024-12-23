@@ -1,3 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/execlineb -P
+
+s6-setuidgid root
+
+exec openvpn --mktun --dev tun
+
+s6-setuidgid openvpn
 
 exec ovpn_run
