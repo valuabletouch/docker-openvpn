@@ -3,7 +3,7 @@
 if [ "$DEBUG" == "1" ]; then
     set -x
 
-    woami
+    whoami
 fi
 
 exec dnsmasq --conf-file=$DNSMASQ_CONF --keep-in-foreground

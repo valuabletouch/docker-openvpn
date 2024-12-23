@@ -3,13 +3,13 @@
 if [ "$DEBUG" == "1" ]; then
     set -x
 
-    woami
+    whoami
 fi
 
 s6-setuidgid root
 
 if [ "$DEBUG" == "1" ]; then
-    woami
+    whoami
 fi
 
 exec ovpn_run
