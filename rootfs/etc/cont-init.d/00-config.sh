@@ -8,7 +8,7 @@ echo "[cont-init.d] 00-config.sh - Starting..."
 if [ ! -f "$OPENVPN_CONF" ]; then
   echo "[cont-init.d] No openvpn.conf found. Generating..."
 
-  ovpn_genconfig
+  ovpn_genconfig -u $OVPN_SERVER_URL
 
   echo "[cont-init.d] openvpn.conf created, now init pki..."
 
