@@ -45,7 +45,7 @@ jobs:
       - name: Build and push '${{ github.repository_owner }}/openvpn:latest'
         uses: docker/build-push-action@v6
         with:
-          push: github.event_name != 'pull_request'
+          push: ${{ github.event_name != 'pull_request' }}
           file: ./Dockerfile
           context: .
           tags: ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest
