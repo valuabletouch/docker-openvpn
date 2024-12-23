@@ -7,10 +7,10 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 ENV S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
 
 RUN set -ex; \
-    echo "http://dl-4.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories; \
-    echo "http://dl-4.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories; \
-    apk update; \
-    apk add --no-cache \
+    apk add \
+        --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --update \
+        --no-cache \
         openvpn \
         easy-rsa \
         dnsmasq \
@@ -19,9 +19,16 @@ RUN set -ex; \
         bash \
         curl \
         openvpn-auth-pam \
-        google-authenticator \
-        pamtester; \
+        google-authenticator; \
     ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin; \
+    rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
+
+RUN set -ex; \
+    apk add \
+        --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --update \
+        --no-cache \
+        pamtester; \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
 
 RUN set -ex; \
