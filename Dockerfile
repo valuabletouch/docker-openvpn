@@ -3,6 +3,7 @@ FROM alpine:latest
 LABEL maintainer="Mehmet Yasin AKAR <yasin.akar@valuabletouch.com>"
 
 ENV S6_OVERLAY_VERSION=v3.2.0.2
+ENV S6_KEEP_ENV=1
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 ENV S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
 
