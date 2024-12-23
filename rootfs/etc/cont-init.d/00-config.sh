@@ -26,7 +26,7 @@ if [ ! -f "${DNSMASQ_CONF}" ]; then
   cat << EOF > "${DNSMASQ_CONF}"
 server=127.0.0.11
 interface=tun0
-bind-interfaces
+bind-dynamic
 log-facility=-
 log-queries
 EOF
