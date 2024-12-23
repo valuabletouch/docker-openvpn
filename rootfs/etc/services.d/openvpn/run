@@ -1,4 +1,4 @@
-#!/usr/bin/execlineb -P
+#!/usr/bin/env bash
 
 s6-setuidgid root
 

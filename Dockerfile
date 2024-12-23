@@ -20,9 +20,7 @@ RUN set -ex; \
         bash \
         curl \
         openvpn-auth-pam \
-        google-authenticator \
-        libcap-setcap; \
-    setcap CAP_NET_ADMIN+ep $(which openvpn); \
+        google-authenticator; \
     ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin; \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
 
