@@ -19,5 +19,5 @@ services:
         source: ./openvpn
         target: /etc/openvpn
       - type: bind
-        source: ./dnsmasq.d
+        source: ./dnsmasq
         target: /etc/dnsmasq.d
