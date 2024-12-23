@@ -26,23 +26,26 @@ jobs:
 
     steps:
       - name: Checkout files
-        uses: actions/checkout@v2
-
-      - name: Build '${{ github.repository_owner }}/openvpn:latest'
-        run: |
-          docker build \
-              --file ./Dockerfile \
-              --tag ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest \
-              .
+        uses: actions/checkout@v4
 
       - name: Login to GitHub Docker Registry
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.IMAGE_REGISTRY }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push '${{ github.repository_owner }}/openvpn:latest'
-        if: github.event_name != 'pull_request'
-        run: docker push ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest
+      - name: Set up QEMU for cross-platform builds
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push '${{ github.repository_owner }}/openvpn:latest'
+        uses: docker/build-push-action@v6
+        with:
+          push: github.event_name != 'pull_request'
+          file: ./Dockerfile
+          context: .
+          tags: ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest
