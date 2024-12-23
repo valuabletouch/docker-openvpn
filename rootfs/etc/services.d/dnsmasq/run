@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
-exec dnsmasq --conf-file=/etc/dnsmasq.d/dnsmasq.conf --keep-in-foreground
+if [ "$DEBUG" == "1" ]; then
+    set -x
+
+    woami
+fi
+
+exec dnsmasq --conf-file=$DNSMASQ_CONF --keep-in-foreground

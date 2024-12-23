@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+if [ "$DEBUG" == "1" ]; then
+    set -x
+
+    woami
+fi
+
 s6-setuidgid root
+
+if [ "$DEBUG" == "1" ]; then
+    woami
+fi
 
 exec ovpn_run
