@@ -1,3 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/execlineb -P
 
-exec s6-setuidgid root ovpn_run
+s6-setuidgid root
+
+exec ovpn_run
