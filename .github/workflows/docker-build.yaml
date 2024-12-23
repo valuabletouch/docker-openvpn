@@ -1,0 +1,48 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+  repository_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+
+jobs:
+  linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v2
+
+      - name: Build '${{ github.repository_owner }}/openvpn:latest'
+        run: |
+          docker build \
+              --file ./Dockerfile \
+              --tag ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest \
+              .
+
+      - name: Login to GitHub Docker Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push '${{ github.repository_owner }}/openvpn:latest'
+        if: github.event_name != 'pull_request'
+        run: docker push ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/openvpn:latest

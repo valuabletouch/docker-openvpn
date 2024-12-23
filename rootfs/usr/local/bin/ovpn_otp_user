@@ -1,8 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Generate OpenVPN users via google authenticator
 #
+
+if [ "$DEBUG" == "1" ]; then
+    set -x
+fi
 
 if ! source "$OPENVPN/ovpn_env.sh"; then
     echo "Could not source $OPENVPN/ovpn_env.sh."
@@ -26,9 +30,21 @@ fi
 if [ "$2" == "interactive" ]; then
     # Authenticator will ask for other parameters. User can choose rate limit, token reuse policy and time window policy
     # Always use time base OTP otherwise storage for counters must be configured somewhere in volume
-    google-authenticator --time-based --force -l "${1}@${OVPN_CN}" -s /etc/openvpn/otp/${1}.google_authenticator
+    google-authenticator \
+        --time-based \
+        --force \
+        -l "${1}@${OVPN_CN}" \
+        -s /etc/openvpn/otp/${1}.google_authenticator
 else
     # Skip confirmation if not running in interctive mode. Essential for integration tests.
-    google-authenticator --time-based --disallow-reuse --force --rate-limit=3 --rate-time=30 --window-size=3 \
-        -l "${1}@${OVPN_CN}" -s /etc/openvpn/otp/${1}.google_authenticator --no-confirm
+    google-authenticator \
+        --time-based \
+        --disallow-reuse \
+        --force \
+        --rate-limit=3 \
+        --rate-time=30 \
+        --window-size=3 \
+        -l "${1}@${OVPN_CN}" \
+        -s /etc/openvpn/otp/${1}.google_authenticator \
+        --no-confirm
 fi

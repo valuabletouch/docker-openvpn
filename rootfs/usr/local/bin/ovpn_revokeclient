@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Revoke a client certificate
@@ -13,10 +13,12 @@ set -e
 if [ -z "$OPENVPN" ]; then
     export OPENVPN="$PWD"
 fi
+
 if ! source "$OPENVPN/ovpn_env.sh"; then
     echo "Could not source $OPENVPN/ovpn_env.sh."
     exit 1
 fi
+
 if [ -z "$EASYRSA_PKI" ]; then
     export EASYRSA_PKI="$OPENVPN/pki"
 fi

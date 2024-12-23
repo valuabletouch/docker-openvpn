@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #
 # Get OpenVPN server status
 #
+
 if [ "$DEBUG" == "1" ]; then
-  set -x
+    set -x
 fi
 
 set -e

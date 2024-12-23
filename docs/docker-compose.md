@@ -6,14 +6,15 @@
 version: '2'
 services:
   openvpn:
+    image: ghcr.io/valuabletouch/openvpn
+    restart: always
+    container_name: openvpn
     cap_add:
      - NET_ADMIN
-    image: kylemanna/openvpn
-    container_name: openvpn
     ports:
      - "1194:1194/udp"
-    restart: always
     volumes:
+     - ./dnsmasq-data/conf:/etc/dnsmasq.d
      - ./openvpn-data/conf:/etc/openvpn
 ```
 

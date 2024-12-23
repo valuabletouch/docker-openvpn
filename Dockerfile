@@ -1,31 +1,57 @@
-# Original credit: https://github.com/jpetazzo/dockvpn
-
-# Smallest base image
 FROM alpine:latest
 
-LABEL maintainer="Kyle Manna <kyle@kylemanna.com>"
+LABEL maintainer="Mehmet Yasin AKAR <yasin.akar@valuabletouch.com>"
 
-# Testing: pamtester
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
-    apk add --update openvpn iptables bash easy-rsa openvpn-auth-pam google-authenticator pamtester libqrencode && \
-    ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin && \
+ENV S6_OVERLAY_VERSION=v3.2.0.2
+ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
+ENV S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
+
+RUN set -ex; \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories; \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories; \
+    apk update; \
+    apk add --no-cache \
+        openvpn \
+        easy-rsa \
+        dnsmasq \
+        iptables \
+        iproute2 \
+        bash \
+        curl \
+        openvpn-auth-pam \
+        google-authenticator \
+        pamtester; \
+    ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin; \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
 
-# Needed by scripts
+RUN set -ex; \
+    curl -L https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz | \
+        tar -C / -Jxvf -; \
+    curl -L https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz | \
+        tar -C / -Jxvf -
+
+COPY rootfs/ /
+
+RUN chmod a+x /usr/local/bin/ovpn_*
+RUN chmod a+x /cont-init.d/*
+RUN chmod a+x /services.d/*/run
+
 ENV OPENVPN=/etc/openvpn
-ENV EASYRSA=/usr/share/easy-rsa \
-    EASYRSA_CRL_DAYS=3650 \
-    EASYRSA_PKI=$OPENVPN/pki
+ENV OPENVPN_CONF=$OPENVPN/openvpn.conf
+
+ENV EASYRSA=/usr/share/easy-rsa
+ENV EASYRSA_PKI=$OPENVPN/pki
+ENV EASYRSA_CRL_DAYS=3650
+
+ENV DNSMASQ=/etc/dnsmasq.d
+ENV DNSMASQ_CONF=$DNSMASQ/dnsmasq.conf
+
+EXPOSE 1194/udp
+
+VOLUME ["/etc/dnsmasq.d"]
 
 VOLUME ["/etc/openvpn"]
 
-# Internally uses port 1194/udp, remap using `docker run -p 443:1194/tcp`
-EXPOSE 1194/udp
+ENTRYPOINT ["/init"]
 
-CMD ["ovpn_run"]
-
-ADD ./bin /usr/local/bin
-RUN chmod a+x /usr/local/bin/*
-
-# Add support for OTP authentication using a PAM module
-ADD ./otp/openvpn /etc/pam.d/
+CMD []

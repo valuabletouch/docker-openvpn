@@ -1,21 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 ## @licence MIT <http://opensource.org/licenses/MIT>
 ## @author Copyright (C) 2015 Robin Schneider <ypid@riseup.net>
+
+#
+# Copy the server files to a target directory
+#
+
+if [ "$DEBUG" == "1" ]; then
+    set -x
+fi
 
 set -e
 
 if [ -z "$OPENVPN" ]; then
     export OPENVPN="$PWD"
 fi
+
 if ! source "$OPENVPN/ovpn_env.sh"; then
     echo "Could not source $OPENVPN/ovpn_env.sh."
     exit 1
 fi
 
 TARGET="$OPENVPN/server"
+
 if [ -n "$1" ]; then
     TARGET="$1"
 fi
+
 mkdir -p "${TARGET}"
 
 ## Ensure that no other keys then the one for the server is present.

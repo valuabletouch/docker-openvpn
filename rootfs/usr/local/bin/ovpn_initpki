@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Initialize the EasyRSA PKI
 #
 
 if [ "$DEBUG" == "1" ]; then
-  set -x
+    set -x
 fi
 
 set -e
@@ -19,11 +19,12 @@ nopass=$1
 easyrsa init-pki
 
 # CA always has a password for protection in event server is compromised. The
-# password is only needed to sign client/server certificates.  No password is
+# password is only needed to sign client/server certificates. No password is
 # needed for normal OpenVPN operation.
 easyrsa build-ca $nopass
 
 easyrsa gen-dh
+
 openvpn --genkey --secret $EASYRSA_PKI/ta.key
 
 # Was nice to autoset, but probably a bad idea in practice, users should

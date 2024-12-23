@@ -1,0 +1,23 @@
+services:
+  openvpn:
+    build: .
+    restart: unless-stopped
+    container_name: openvpn
+    cap_add:
+      - NET_ADMIN
+    dns:
+      - 127.0.0.11
+    ports:
+      - mode: host
+        published: 1194
+        target: 1194
+        protocol: udp
+    environment:
+      - OVPN_SERVER_URL=udp://vpn.example.com:1194
+    volumes:
+      - type: bind
+        source: ./openvpn
+        target: /etc/openvpn
+      - type: bind
+        source: ./dnsmasq.d
+        target: /etc/dnsmasq.d

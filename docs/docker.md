@@ -1,6 +1,6 @@
 # Install Latest Docker Service
 
-Docker included with some distributions lags far behind upstream.  This guide aims to provide a quick and reliable way to install or update it.
+Docker included with some distributions lags far behind upstream. This guide aims to provide a quick and reliable way to install or update it.
 
 It is recommended to use platforms that support systemd as future versions of this docker image may require systemd to help with some tasks:
 
