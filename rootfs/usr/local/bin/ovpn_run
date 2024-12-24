@@ -10,7 +10,20 @@ fi
 
 set -e
 
+if [ -z "${OPENVPN:-}" ]; then
+    export OPENVPN="$PWD"
+fi
+
+if [ -z "${EASYRSA_PKI:-}" ]; then
+    export EASYRSA_PKI="$OPENVPN/pki"
+fi
+
 cd $OPENVPN
+
+OPENVPN_CONF=$OPENVPN/openvpn.conf
+
+OVPN_SUBNET=${OVPN_SUBNET:-10.8.0.0/24}
+
 
 # Build runtime arguments array based on environment
 USER_ARGS=("${@}")
@@ -44,8 +57,8 @@ function addArg {
 # this allows rules/routing to be altered by supplying this function
 # in an included file, such as ovpn_env.sh
 function setupIptablesAndRouting {
-    iptables -t nat -C POSTROUTING -s $OVPN_SERVER -o $OVPN_NATDEVICE -j MASQUERADE 2>/dev/null || {
-      iptables -t nat -A POSTROUTING -s $OVPN_SERVER -o $OVPN_NATDEVICE -j MASQUERADE
+    iptables -t nat -C POSTROUTING -s $OVPN_SUBNET -o $OVPN_NATDEVICE -j MASQUERADE 2>/dev/null || {
+      iptables -t nat -A POSTROUTING -s $OVPN_SUBNET -o $OVPN_NATDEVICE -j MASQUERADE
     }
 
     for i in "${OVPN_ROUTES[@]}"; do

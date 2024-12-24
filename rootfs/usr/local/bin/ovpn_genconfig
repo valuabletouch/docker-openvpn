@@ -8,6 +8,16 @@ if [ "$DEBUG" == "1" ]; then
     set -x
 fi
 
+if [ -z "${OPENVPN:-}" ]; then
+    export OPENVPN="$PWD"
+fi
+
+if [ -z "${EASYRSA_PKI:-}" ]; then
+    export EASYRSA_PKI="$OPENVPN/pki"
+fi
+
+OPENVPN_CONF=$OPENVPN/openvpn.conf
+
 TMP_PUSH_CONFIGFILE=$(mktemp -t vpn_push.XXXXXXX)
 TMP_ROUTE_CONFIGFILE=$(mktemp -t vpn_route.XXXXXXX)
 TMP_EXTRA_CONFIGFILE=$(mktemp -t vpn_extra.XXXXXXX)
@@ -154,19 +164,10 @@ process_extra_config() {
 
 set -e
 
-if [ -z "${OPENVPN:-}" ]; then
-    export OPENVPN="$PWD"
-fi
-
-if [ -z "${EASYRSA_PKI:-}" ]; then
-    export EASYRSA_PKI="$OPENVPN/pki"
-fi
-
 OVPN_AUTH=''
 OVPN_CIPHER=''
 OVPN_CLIENT_TO_CLIENT=''
 OVPN_CN=''
-OVPN_COMP_LZO=0
 OVPN_DEFROUTE=1
 OVPN_DEVICE="tun"
 OVPN_DEVICEN=0
@@ -184,7 +185,8 @@ OVPN_PORT=${OVPN_PORT:-1194}
 OVPN_PROTO=${OVPN_PROTO:-udp}
 OVPN_PUSH=()
 OVPN_ROUTES=()
-OVPN_SERVER=${OVPN_SERVER:-10.8.0.0/24}
+OVPN_SUBNET=${OVPN_SUBNET:-10.8.0.0/24}
+OVPN_SERVER=${OVPN_SERVER:-10.8.0.1}
 OVPN_SERVER_URL=${OVPN_SERVER_URL:-}
 OVPN_TLS_CIPHER=''
 
@@ -192,7 +194,7 @@ OVPN_TLS_CIPHER=''
 [ -r "$OVPN_ENV" ] && source "$OVPN_ENV"
 
 # Parse arguments
-while getopts ":a:e:E:C:T:r:s:du:bcp:n:k:DNm:f:tz2" opt; do
+while getopts ":a:e:E:C:T:r:s:h:du:bcp:n:k:DNm:f:tz2" opt; do
     case $opt in
         a)
             OVPN_AUTH="$OPTARG"
@@ -234,12 +236,16 @@ while getopts ":a:e:E:C:T:r:s:du:bcp:n:k:DNm:f:tz2" opt; do
             ;;
 
         s)
-            OVPN_SERVER="$OPTARG"
+            OVPN_SUBNET="$OPTARG"
             ;;
 
         d)
             OVPN_DEFROUTE=0
             OVPN_DISABLE_PUSH_BLOCK_DNS=1
+            ;;
+
+        h)
+            OVPN_SERVER="$OPTARG"
             ;;
 
         u)
@@ -292,10 +298,6 @@ while getopts ":a:e:E:C:T:r:s:du:bcp:n:k:DNm:f:tz2" opt; do
             OVPN_DEVICE="tap"
             ;;
 
-        z)
-            OVPN_COMP_LZO=1
-            ;;
-
         2)
             OVPN_OTP_AUTH=1
             ;;
@@ -344,7 +346,7 @@ set +u
 
 set -u
 
-[ "${#OVPN_ROUTES[@]}" == "0" ] && [ "$OVPN_DEFROUTE" == "1" ] && OVPN_ROUTES+=("$OVPN_SERVER")
+[ "${#OVPN_ROUTES[@]}" == "0" ] && [ "$OVPN_DEFROUTE" == "1" ] && OVPN_ROUTES+=("$OVPN_SUBNET")
 
 # Preserve config
 if [ -f "$OVPN_ENV" ]; then
@@ -374,31 +376,35 @@ if [ ${#OVPN_EXTRA_CLIENT_CONFIG[@]} -gt 0 ]; then
 fi
 
 cat << EOF > "$OPENVPN_CONF"
-server $(getroute $OVPN_SERVER)
-verb 3
+verb 4
 
-key $EASYRSA_PKI/private/$OVPN_CN.key
-ca $EASYRSA_PKI/ca.crt
-cert $EASYRSA_PKI/issued/$OVPN_CN.crt
-dh $EASYRSA_PKI/dh.pem
-tls-auth $EASYRSA_PKI/ta.key
-key-direction 0
-
-keepalive $OVPN_KEEPALIVE
-persist-key
-persist-tun
+server $(getroute $OVPN_SUBNET)
 
 proto $OVPN_PROTO
 port 1194
 
+keepalive $OVPN_KEEPALIVE
+
+ca $EASYRSA_PKI/ca.crt
+dh $EASYRSA_PKI/dh.pem
+
+key $EASYRSA_PKI/private/$OVPN_CN.key
+cert $EASYRSA_PKI/issued/$OVPN_CN.crt
+
+tls-auth $EASYRSA_PKI/ta.key
+
+persist-key
+
 dev $OVPN_DEVICE$OVPN_DEVICEN
+
+persist-tun
 
 status /tmp/openvpn-status.log
 
 user nobody
 group nogroup
 
-push "dhcp-option DNS ${OVPN_SERVER%/*}"
+push "dhcp-option DNS $OVPN_SERVER"
 EOF
 
 if [ "${OVPN_DISABLE_PUSH_BLOCK_DNS}" == "1" ]; then
@@ -412,8 +418,6 @@ fi
 [ -n "$OVPN_AUTH" ] && echo "auth $OVPN_AUTH" >> "$OPENVPN_CONF"
 
 [ -n "${OVPN_CLIENT_TO_CLIENT:-}" ] && echo "client-to-client" >> "$OPENVPN_CONF"
-[ "$OVPN_COMP_LZO" == "1" ] && echo "comp-lzo" >> "$OPENVPN_CONF"
-[ "$OVPN_COMP_LZO" == "0" ] && echo "comp-lzo no" >> "$OPENVPN_CONF"
 
 [ -n "${OVPN_FRAGMENT:-}" ] && echo "fragment $OVPN_FRAGMENT" >> "$OPENVPN_CONF"
 
@@ -432,10 +436,6 @@ fi
 [ "$OVPN_DNS" == "1" ] && for i in "${OVPN_DNS_SERVERS[@]}"; do
     process_push_config "dhcp-option DNS $i"
 done
-
-if [ "$OVPN_COMP_LZO" == "0" ]; then
-    process_push_config "comp-lzo no"
-fi
 
 [ ${#OVPN_PUSH[@]} -gt 0 ] && for i in "${OVPN_PUSH[@]}"; do
     process_push_config "$i"

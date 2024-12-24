@@ -44,21 +44,21 @@ RUN chmod a+x /usr/local/bin/ovpn_*
 RUN chmod a+x /etc/cont-init.d/*
 RUN chmod a+x /etc/services.d/*/run
 
-ENV OPENVPN=/etc/openvpn
-ENV OPENVPN_CONF=$OPENVPN/openvpn.conf
-
 ENV EASYRSA=/usr/share/easy-rsa
-ENV EASYRSA_PKI=$OPENVPN/pki
 ENV EASYRSA_CRL_DAYS=3650
 
 ENV DNSMASQ=/etc/dnsmasq.d
-ENV DNSMASQ_CONF=$DNSMASQ/dnsmasq.conf
+
+ENV OPENVPN=/etc/openvpn
+ENV OVPN_SUBNET=10.8.0.0/24
+ENV OVPN_SERVER=10.8.0.1
 
 EXPOSE 1194/udp
 
-VOLUME ["/etc/dnsmasq.d"]
-
-VOLUME ["/etc/openvpn"]
+VOLUME [
+    "/etc/dnsmasq.d",
+    "/etc/openvpn"
+]
 
 ENTRYPOINT ["/init"]
 

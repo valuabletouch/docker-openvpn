@@ -10,6 +10,10 @@ fi
 
 set -e
 
+if [ -z "${EASYRSA_PKI:-}" ]; then
+    export EASYRSA_PKI="$OPENVPN/pki"
+fi
+
 source "$OPENVPN/ovpn_env.sh"
 
 # Specify "nopass" as arg[2] to make the CA insecure (not recommended!)

@@ -17,7 +17,7 @@ docker run -d --name $NAME -v $OVPN_DATA:/etc/openvpn --cap-add=NET_ADMIN $IMG
 
 # check default iptables rules
 for i in $(seq 10); do
-    docker exec -ti $NAME bash -c 'source /etc/openvpn/ovpn_env.sh; exec iptables -t nat -C POSTROUTING -s $OVPN_SERVER -o eth0 -j MASQUERADE' && break
+    docker exec -ti $NAME bash -c 'source /etc/openvpn/ovpn_env.sh; exec iptables -t nat -C POSTROUTING -s $OVPN_SUBNET -o eth0 -j MASQUERADE' && break
     echo waiting for server start-up
     sleep 1
 done

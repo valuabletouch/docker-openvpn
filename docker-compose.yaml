@@ -10,8 +10,6 @@ services:
       net.ipv4.ip_forward: 1
       net.ipv6.conf.all.forwarding: 1
       net.ipv6.conf.all.disable_ipv6: 0
-    dns:
-      - 127.0.0.11
     ports:
       - mode: host
         published: 1194
