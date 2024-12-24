@@ -18,6 +18,8 @@ fi
 
 OPENVPN_CONF=$OPENVPN/openvpn.conf
 
+OVPN_ENV=$OPENVPN/ovpn_env.sh
+
 TMP_PUSH_CONFIGFILE=$(mktemp -t vpn_push.XXXXXXX)
 TMP_ROUTE_CONFIGFILE=$(mktemp -t vpn_route.XXXXXXX)
 TMP_EXTRA_CONFIGFILE=$(mktemp -t vpn_extra.XXXXXXX)
@@ -36,12 +38,12 @@ traceback() {
 
     echo "Traceback (last called is first):" 1>&2
 
-    for ((i=${start}; i < ${end}; i++)); do
+    for ((i=$start; i < $end; i++)); do
         j=$(( $i - 1 ))
         local function="${FUNCNAME[$i]}"
         local file="${BASH_SOURCE[$i]}"
         local line="${BASH_LINENO[$j]}"
-        echo "     ${function}() in ${file}:${line}" 1>&2
+        echo "     $function() in $file:$line" 1>&2
     done
 }
 
@@ -53,7 +55,7 @@ on_error() {
 
     _showed_traceback=t
 
-    echo "The command ${_cmd} exited with exit code ${_ec}." 1>&2
+    echo "The command $_cmd exited with exit code $_ec." 1>&2
 }
 
 trap on_error ERR
@@ -67,7 +69,7 @@ on_exit() {
 
     local _ec="$?"
 
-    if [[ $_ec != 0 && "${_showed_traceback}" != t ]]; then
+    if [[ $_ec != 0 && "$_showed_traceback" != t ]]; then
         traceback 1
     fi
 }
@@ -82,7 +84,7 @@ cidr2mask() {
     local full_octets=$(($cidr/8))
     local partial_octet=$(($cidr%8))
 
-    for ((i=0;i<4;i+=1)); do
+    for ((i=0; i<4; i+=1)); do
         if [ $i -lt $full_octets ]; then
             subnetmask+=255
         elif [ $i -eq $full_octets ]; then
@@ -130,9 +132,7 @@ usage() {
 }
 
 process_route_config() {
-    local ovpn_route_config=''
-
-    ovpn_route_config="$1"
+    local ovpn_route_config="$1"
 
     # If user passed "0" skip this, assume no extra routes
     [[ "$ovpn_route_config" == "0" ]] && break;
@@ -143,7 +143,7 @@ process_route_config() {
 }
 
 process_push_config() {
-    local ovpn_push_config=''
+    local ovpn_push_config="$1"
 
     ovpn_push_config="$1"
 
@@ -153,9 +153,7 @@ process_push_config() {
 }
 
 process_extra_config() {
-    local ovpn_extra_config=''
-
-    ovpn_extra_config="$1"
+    local ovpn_extra_config="$1"
 
     echo "Processing Extra Config: '${ovpn_extra_config}'"
 
@@ -163,6 +161,10 @@ process_extra_config() {
 }
 
 set -e
+
+OVPN_SUBNET=${OVPN_SUBNET:-10.8.0.0/24}
+OVPN_SERVER=${OVPN_SERVER:-10.8.0.1}
+OVPN_SERVER_URL=${OVPN_SERVER_URL:-}
 
 OVPN_AUTH=''
 OVPN_CIPHER=''
@@ -174,7 +176,6 @@ OVPN_DEVICEN=0
 OVPN_DISABLE_PUSH_BLOCK_DNS=0
 OVPN_DNS=1
 OVPN_DNS_SERVERS=()
-OVPN_ENV=${OPENVPN}/ovpn_env.sh
 OVPN_EXTRA_CLIENT_CONFIG=()
 OVPN_EXTRA_SERVER_CONFIG=()
 OVPN_FRAGMENT=''
@@ -185,9 +186,6 @@ OVPN_PORT=${OVPN_PORT:-1194}
 OVPN_PROTO=${OVPN_PROTO:-udp}
 OVPN_PUSH=()
 OVPN_ROUTES=()
-OVPN_SUBNET=${OVPN_SUBNET:-10.8.0.0/24}
-OVPN_SERVER=${OVPN_SERVER:-10.8.0.1}
-OVPN_SERVER_URL=${OVPN_SERVER_URL:-}
 OVPN_TLS_CIPHER=''
 
 # Import existing configuration if present

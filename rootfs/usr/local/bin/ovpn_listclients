@@ -33,6 +33,7 @@ echo "Name, Status, Begin, End"
 
 for name in issued/*.crt; do
     path=$name
+
     begin=$(openssl x509 -noout -startdate -in $path | awk -F= '{ print $2 }')
     end=$(openssl x509 -noout -enddate -in $path | awk -F= '{ print $2 }')
 
@@ -41,8 +42,7 @@ for name in issued/*.crt; do
 
     if [ "$name" != "$OVPN_CN" ]; then
         # check for revocation or expiration
-        command="openssl verify -crl_check -CAfile cacheck.pem $path"
-        result=$($command)
+        result=$(openssl verify -crl_check -CAfile cacheck.pem $path)
 
         if [ $(echo "$result" | wc -l) == 1 ] && [ "$(echo "$result" | grep ": OK")" ]; then
             status="VALID"

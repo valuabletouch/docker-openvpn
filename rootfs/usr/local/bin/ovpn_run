@@ -31,10 +31,12 @@ ARGS=()
 
 # Checks if ARGS already contains the given value
 function hasArg {
+    local arg="$1"
+
     local element
 
     for element in "${@:2}"; do
-        [ "${element}" == "${1}" ] && return 0
+        [ "$element" == "$arg" ] && return 0
     done
 
     return 1
@@ -42,14 +44,14 @@ function hasArg {
 
 # Adds the given argument if it's not already specified.
 function addArg {
-    local arg="${1}"
+    local arg="$1"
 
-    [ $# -ge 1 ] && local val="${2}"
+    [ $# -ge 1 ] && local val="$2"
 
-    if ! hasArg "${arg}" "${USER_ARGS[@]}"; then
-        ARGS+=("${arg}")
+    if ! hasArg "$arg" "${USER_ARGS[@]}"; then
+        ARGS+=("$arg")
 
-        [ $# -ge 1 ] && ARGS+=("${val}")
+        [ $# -ge 1 ] && ARGS+=("$val")
     fi
 }
 
@@ -61,9 +63,9 @@ function setupIptablesAndRouting {
       iptables -t nat -A POSTROUTING -s $OVPN_SUBNET -o $OVPN_NATDEVICE -j MASQUERADE
     }
 
-    for i in "${OVPN_ROUTES[@]}"; do
-        iptables -t nat -C POSTROUTING -s "$i" -o $OVPN_NATDEVICE -j MASQUERADE 2>/dev/null || {
-          iptables -t nat -A POSTROUTING -s "$i" -o $OVPN_NATDEVICE -j MASQUERADE
+    for subnet in "${OVPN_ROUTES[@]}"; do
+        iptables -t nat -C POSTROUTING -s "$subnet" -o $OVPN_NATDEVICE -j MASQUERADE 2>/dev/null || {
+          iptables -t nat -A POSTROUTING -s "$subnet" -o $OVPN_NATDEVICE -j MASQUERADE
         }
     done
 }
