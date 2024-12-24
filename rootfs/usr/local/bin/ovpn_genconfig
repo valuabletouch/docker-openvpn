@@ -351,7 +351,9 @@ set -u
 # Preserve config
 if [ -f "$OVPN_ENV" ]; then
     bak_env=$OVPN_ENV.$(date +%s).bak
+
     echo "Backing up $OVPN_ENV -> $bak_env"
+
     mv "$OVPN_ENV" "$bak_env"
 fi
 

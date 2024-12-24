@@ -55,10 +55,7 @@ ENV OVPN_SERVER=10.8.0.1
 
 EXPOSE 1194/udp
 
-VOLUME [
-    "/etc/dnsmasq.d",
-    "/etc/openvpn"
-]
+VOLUME ["/etc/dnsmasq.d", "/etc/openvpn"]
 
 ENTRYPOINT ["/init"]
 
