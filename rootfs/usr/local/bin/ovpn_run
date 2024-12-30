@@ -4,17 +4,17 @@
 # Run the OpenVPN server normally
 #
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
 set -e
 
-if [ -z "${OPENVPN:-}" ]; then
+if [[ -z "${OPENVPN:-}" ]]; then
     export OPENVPN="$PWD"
 fi
 
-if [ -z "${EASYRSA_PKI:-}" ]; then
+if [[ -z "${EASYRSA_PKI:-}" ]]; then
     export EASYRSA_PKI="$OPENVPN/pki"
 fi
 
@@ -36,7 +36,9 @@ function hasArg {
     local element
 
     for element in "${@:2}"; do
-        [ "$element" == "$arg" ] && return 0
+        if [[ "$element" == "$arg" ]]; then
+            return 0
+        fi
     done
 
     return 1
@@ -46,12 +48,16 @@ function hasArg {
 function addArg {
     local arg="$1"
 
-    [ $# -ge 1 ] && local val="$2"
+    if [[ $# -ge 1 ]]; then
+        local val="$2"
+    fi
 
     if ! hasArg "$arg" "${USER_ARGS[@]}"; then
         ARGS+=("$arg")
 
-        [ $# -ge 1 ] && ARGS+=("$val")
+        if [[ $# -ge 1 ]]; then
+            ARGS+=("$val")
+        fi
     fi
 }
 
@@ -76,19 +82,21 @@ source "$OPENVPN/ovpn_env.sh"
 
 mkdir -p /dev/net
 
-if [ ! -c /dev/net/tun ]; then
+if [[ ! -c /dev/net/tun ]]; then
     mknod /dev/net/tun c 10 200
 fi
 
-if [ -d "$OPENVPN/ccd" ]; then
+if [[ -d "$OPENVPN/ccd" ]]; then
     addArg "--client-config-dir" "$OPENVPN/ccd"
 fi
 
 # When using --net=host, use this to specify nat device.
-[ -z "$OVPN_NATDEVICE" ] && OVPN_NATDEVICE=eth0
+if [[ -z "$OVPN_NATDEVICE" ]]; then
+    OVPN_NATDEVICE=eth0
+fi
 
 # Setup NAT forwarding if requested
-if [ "$OVPN_DEFROUTE" != "0" ] || [ "$OVPN_NAT" == "1" ] ; then
+if [[ "$OVPN_DEFROUTE" != "0" || "$OVPN_NAT" == "1" ]]; then
 	# call function to setup iptables rules and routing
 	# this allows rules to be customized by supplying
 	# a replacement function in, for example, ovpn_env.sh
@@ -97,30 +105,30 @@ fi
 
 # Use a copy of crl.pem as the CRL Needs to be readable by the user/group
 # OpenVPN is running as. Only pass arguments to OpenVPN if it's found.
-if [ "$EASYRSA_PKI/crl.pem" -nt "$OPENVPN/crl.pem" ]; then
+if [[ "$EASYRSA_PKI/crl.pem" -nt "$OPENVPN/crl.pem" ]]; then
     cp -f "$EASYRSA_PKI/crl.pem" "$OPENVPN/crl.pem"
 
     chmod 644 "$OPENVPN/crl.pem"
 fi
 
-if [ -r "$OPENVPN/crl.pem" ]; then
+if [[ -r "$OPENVPN/crl.pem" ]]; then
     addArg "--crl-verify" "$OPENVPN/crl.pem"
 fi
 
 ip -6 route show default 2>/dev/null
 
-if [ $? = 0 ]; then
+if [[ $? = 0 ]]; then
     echo "Checking IPv6 Forwarding"
 
-    if [ "$(</proc/sys/net/ipv6/conf/all/disable_ipv6)" != "0" ]; then
+    if [[ "$(</proc/sys/net/ipv6/conf/all/disable_ipv6)" != "0" ]]; then
         echo "Sysctl error for disable_ipv6, please run docker with '--sysctl net.ipv6.conf.all.disable_ipv6=0'"
     fi
 
-    if [ "$(</proc/sys/net/ipv6/conf/default/forwarding)" != "1" ]; then
+    if [[ "$(</proc/sys/net/ipv6/conf/default/forwarding)" != "1" ]]; then
         echo "Sysctl error for default forwarding, please run docker with '--sysctl net.ipv6.conf.default.forwarding=1'"
     fi
 
-    if [ "$(</proc/sys/net/ipv6/conf/all/forwarding)" != "1" ]; then
+    if [[ "$(</proc/sys/net/ipv6/conf/all/forwarding)" != "1" ]]; then
         echo "Sysctl error for all forwarding, please run docker with '--sysctl net.ipv6.conf.all.forwarding=1'"
     fi
 fi

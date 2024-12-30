@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 testDir="$(readlink -f "$(dirname "$BASH_SOURCE")")"

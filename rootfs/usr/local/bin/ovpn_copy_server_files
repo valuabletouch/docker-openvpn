@@ -7,13 +7,13 @@
 # Copy the server files to a target directory
 #
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
 set -e
 
-if [ -z "$OPENVPN" ]; then
+if [[ -z "$OPENVPN" ]]; then
     export OPENVPN="$PWD"
 fi
 
@@ -24,7 +24,7 @@ fi
 
 TARGET="$OPENVPN/server"
 
-if [ -n "$1" ]; then
+if [[ -n "$1" ]]; then
     TARGET="$1"
 fi
 
@@ -44,7 +44,7 @@ FILES=(
     "ccd"
 )
 
-if [ -f "$OPENVPN/pki/crl.pem" ]; then
+if [[ -f "$OPENVPN/pki/crl.pem" ]]; then
     FILES+=("pki/crl.pem")
 fi
 

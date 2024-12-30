@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 dir="$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -85,21 +85,21 @@ done
 didFail=
 for dockerImage in "$@"; do
 	echo "testing $dockerImage"
-	
+
 	if ! docker inspect "$dockerImage" &> /dev/null; then
 		echo $'\timage does not exist!'
 		didFail=1
 		continue
 	fi
-	
+
 	repo="${dockerImage%:*}"
 	tagVar="${dockerImage#*:}"
 	#version="${tagVar%-*}"
 	variant="${tagVar##*-}"
-	
+
 	testRepo=$repo
 	[ -z "${testAlias[$repo]}" ] || testRepo="${testAlias[$repo]}"
-	
+
 	explicitVariant=
 	if [ \
 		"${explicitTests[:$variant]}" \
@@ -108,7 +108,7 @@ for dockerImage in "$@"; do
 	]; then
 		explicitVariant=1
 	fi
-	
+
 	testCandidates=()
 	if [ -z "$explicitVariant" ]; then
 		testCandidates+=( "${globalTests[@]}" )
@@ -134,14 +134,14 @@ for dockerImage in "$@"; do
 			${imageTests[$repo:$variant]}
 		)
 	fi
-	
+
 	tests=()
 	for t in "${testCandidates[@]}"; do
 		if [ ${#argTests[@]} -gt 0 -a -z "${argTests[$t]}" ]; then
 			# skipping due to -t
 			continue
 		fi
-		
+
 		if [ \
 			! -z "${globalExcludeTests[${testRepo}_$t]}" \
 			-o ! -z "${globalExcludeTests[${testRepo}:${variant}_$t]}" \
@@ -153,16 +153,16 @@ for dockerImage in "$@"; do
 			# skipping due to exclude
 			continue
 		fi
-		
+
 		tests+=( "$t" )
 	done
-	
+
 	currentTest=0
 	totalTest="${#tests[@]}"
 	for t in "${tests[@]}"; do
 		(( currentTest+=1 ))
 		echo -ne "\t'$t' [$currentTest/$totalTest]..."
-		
+
 		# run test against dockerImage here
 		# find the script for the test
 		scriptDir="${testPaths[$t]}"

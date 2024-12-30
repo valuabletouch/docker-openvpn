@@ -4,13 +4,13 @@
 # Revoke a client certificate
 #
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
 set -e
 
-if [ -z "$OPENVPN" ]; then
+if [[ -z "$OPENVPN" ]]; then
     export OPENVPN="$PWD"
 fi
 
@@ -19,13 +19,13 @@ if ! source "$OPENVPN/ovpn_env.sh"; then
     exit 1
 fi
 
-if [ -z "$EASYRSA_PKI" ]; then
+if [[ -z "$EASYRSA_PKI" ]]; then
     export EASYRSA_PKI="$OPENVPN/pki"
 fi
 
 cn="$1"
 
-if [ ! -f "$EASYRSA_PKI/private/$cn.key" ]; then
+if [[ ! -f "$EASYRSA_PKI/private/$cn.key" ]]; then
     echo "Unable to find \"$cn\", please try again or generate the key first" >&2
     exit 1
 fi

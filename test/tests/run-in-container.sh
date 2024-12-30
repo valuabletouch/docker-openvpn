@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 # NOT INTENDED TO BE USED AS A TEST "run.sh" DIRECTLY

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SERV_IP=$(ip -4 -o addr show scope global  | awk '{print $4}' | sed -e 's:/.*::' | head -n1)
 SERVER_CONF="/etc/openvpn/openvpn.conf"
@@ -10,7 +10,6 @@ abort() { cat <<< "$@" 1>&2; exit 1; }
 # Check a config (haystack) for a given line (needle) exit with error if not
 # found.
 test_config() {
-
     local needle="${2}"
     local file="${1}"
 
@@ -23,7 +22,6 @@ test_config() {
 # Check a config (haystack) for absence of given line (needle) exit with error
 # if found.
 test_not_config() {
-
     local needle="${2}"
     local file="${1}"
 

@@ -4,7 +4,7 @@
 # Generate OpenVPN users via google authenticator
 #
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
@@ -13,21 +13,23 @@ if ! source "$OPENVPN/ovpn_env.sh"; then
     exit 1
 fi
 
-if [ "x$OVPN_OTP_AUTH" != "x1" ]; then
+if [[ "x$OVPN_OTP_AUTH" != "x1" ]]; then
     echo "OTP authentication not enabled, please regenerate configuration using -2 flag"
     exit 1
 fi
 
-if [ -z $1 ]; then
+if [[ -z $1 ]]; then
     echo "Usage: ovpn_otp_user USERNAME"
     exit 1
 fi
 
 # Ensure the otp folder is present
-[ -d /etc/openvpn/otp ] || mkdir -p /etc/openvpn/otp
+if [[ ! -d /etc/openvpn/otp ]]; then
+    mkdir -p /etc/openvpn/otp
+fi
 
 # Binary is present in image, save an $user.google_authenticator file in /etc/openvpn/otp
-if [ "$2" == "interactive" ]; then
+if [[ "$2" == "interactive" ]]; then
     # Authenticator will ask for other parameters. User can choose rate limit, token reuse policy and time window policy
     # Always use time base OTP otherwise storage for counters must be configured somewhere in volume
     google-authenticator \

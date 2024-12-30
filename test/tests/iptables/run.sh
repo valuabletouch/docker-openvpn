@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
-[ -n "${DEBUG+x}" ] && set -x
+if [[ "$DEBUG" == "1" ]]; then
+    set -x
+fi
+
 OVPN_DATA=basic-data
 IMG="ghcr.io/valuabletouch/openvpn"
 NAME="ovpn-test"

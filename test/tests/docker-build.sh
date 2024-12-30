@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 # wrapper around "docker build" that creates a temporary directory and copies files into it first so that arbitrary host directories can be copied into containers without bind mounts, but accepts a Dockerfile on stdin

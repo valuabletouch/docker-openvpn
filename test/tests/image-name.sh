@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 # usage: ./image-name.sh librarytest/something some/image:some-tag

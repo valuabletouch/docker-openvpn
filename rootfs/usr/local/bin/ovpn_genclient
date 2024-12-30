@@ -4,13 +4,13 @@
 # Issue a client certificate
 #
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
 set -e
 
-if [ -z "$OPENVPN" ]; then
+if [[ -z "$OPENVPN" ]]; then
     export OPENVPN="$PWD"
 fi
 
@@ -19,7 +19,7 @@ if ! source "$OPENVPN/ovpn_env.sh"; then
     exit 1
 fi
 
-if [ -z "$EASYRSA_PKI" ]; then
+if [[ -z "$EASYRSA_PKI" ]]; then
     export EASYRSA_PKI="$OPENVPN/pki"
 fi
 
@@ -28,7 +28,7 @@ cn=$1
 # Specify "nopass" as arg[2] to make the cert insecure (not recommended!)
 nopass=$2
 
-if [ "$nopass" == "nopass" ]; then
+if [[ "$nopass" == "nopass" ]]; then
     export EASYRSA_BATCH=1
 fi
 

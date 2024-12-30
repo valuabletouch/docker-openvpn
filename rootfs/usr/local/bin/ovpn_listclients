@@ -4,11 +4,11 @@
 # Lists OpenVPN clients and their certificate statuses
 #
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
-if [ -z "$OPENVPN" ]; then
+if [[ -z "$OPENVPN" ]]; then
     export OPENVPN="$PWD"
 fi
 
@@ -17,13 +17,13 @@ if ! source "$OPENVPN/ovpn_env.sh"; then
     exit 1
 fi
 
-if [ -z "$EASYRSA_PKI" ]; then
+if [[ -z "$EASYRSA_PKI" ]]; then
     export EASYRSA_PKI="$OPENVPN/pki"
 fi
 
 cd "$EASYRSA_PKI"
 
-if [ -e crl.pem ]; then
+if [[ -e crl.pem ]]; then
     cat ca.crt crl.pem > cacheck.pem
 else
     cat ca.crt > cacheck.pem
@@ -40,11 +40,11 @@ for name in issued/*.crt; do
     name=${name%.crt}
     name=${name#issued/}
 
-    if [ "$name" != "$OVPN_CN" ]; then
+    if [[ "$name" != "$OVPN_CN" ]]; then
         # check for revocation or expiration
         result=$(openssl verify -crl_check -CAfile cacheck.pem $path)
 
-        if [ $(echo "$result" | wc -l) == 1 ] && [ "$(echo "$result" | grep ": OK")" ]; then
+        if [[ $(echo "$result" | wc -l) == 1 && "$(echo "$result" | grep ": OK")" ]]; then
             status="VALID"
         else
             result=$(echo "$result" | tail -n 1 | grep error | cut -d" " -f2)

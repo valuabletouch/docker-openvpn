@@ -4,13 +4,13 @@
 # Initialize the EasyRSA PKI
 #
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
 set -e
 
-if [ -z "${EASYRSA_PKI:-}" ]; then
+if [[ -z "${EASYRSA_PKI:-}" ]]; then
     export EASYRSA_PKI="$OPENVPN/pki"
 fi
 
@@ -26,7 +26,7 @@ easyrsa init-pki
 # password is only needed to sign client/server certificates. No password is
 # needed for normal OpenVPN operation.
 
-if [ "$nopass" == "nopass" ]; then
+if [[ "$nopass" == "nopass" ]]; then
     export EASYRSA_BATCH=1
     export EASYRSA_REQ_CN="$OVPN_CN"
 fi
@@ -39,7 +39,7 @@ openvpn --genkey secret $EASYRSA_PKI/ta.key
 
 # Was nice to autoset, but probably a bad idea in practice, users should
 # have to explicitly specify the common name of their server
-#if [ -z "$cn"]; then
+#if [[ -z "$cn"]]; then
 #    #TODO: Handle IPv6 (when I get a VPS with IPv6)...
 #    ip4=$(dig +short myip.opendns.com @resolver1.opendns.com)
 #    ptr=$(dig +short -x $ip4 | sed -e 's:\.$::')

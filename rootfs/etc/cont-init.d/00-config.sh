@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ "$DEBUG" == "1" ]; then
+if [[ "$DEBUG" == "1" ]]; then
     set -x
 fi
 
@@ -9,7 +9,7 @@ set -e
 echo "[cont-init.d] 00-config.sh - Starting..."
 
 # 1) openvpn.conf yoksa ovpn_genconfig ile oluşturun
-if [ ! -f "$OPENVPN/openvpn.conf" ]; then
+if [[ ! -f "$OPENVPN/openvpn.conf" ]]; then
   echo "[cont-init.d] No openvpn.conf found. Generating..."
 
   ovpn_genconfig
@@ -20,7 +20,7 @@ if [ ! -f "$OPENVPN/openvpn.conf" ]; then
 fi
 
 # 2) dnsmasq.conf yoksa oluşturun
-if [ ! -f "$DNSMASQ/dnsmasq.conf" ]; then
+if [[ ! -f "$DNSMASQ/dnsmasq.conf" ]]; then
   echo "[cont-init.d] Creating default dnsmasq.conf..."
 
   cat << EOF > "$DNSMASQ/dnsmasq.conf"
